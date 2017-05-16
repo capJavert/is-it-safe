@@ -1,0 +1,10 @@
+# pycharm project files
+.idea
+
+# Ignore .DS_Store files created by mac
+.DS_Store
+
+#compiled python code & egg-info
+*.egg-info
+*.pyc
+.cache
