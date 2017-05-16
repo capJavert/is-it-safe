@@ -1,5 +1,4 @@
-<h1>Website & Email checker</h1>
-[![Build Status](https://travis-ci.org/capJavert/is-it-safe.svg?branch=master)](https://travis-ci.org/capJavert/is-it-safe)
+<h1>Website & Email checker</h1>[![Build Status](https://travis-ci.org/capJavert/is-it-safe.svg?branch=master)](https://travis-ci.org/capJavert/is-it-safe)
 <h2>Utility for website or email danger checking.</h2>
 <h3>Install</h3>
 <p>
