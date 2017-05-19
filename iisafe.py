@@ -2,6 +2,7 @@ import click
 import requests
 from includes.Scanner import Scanner
 from includes.Result import Result
+import json
 
 # !/usr/bin/python
 # -*- coding: utf8 -*-
@@ -11,7 +12,7 @@ __author__ = '@capJavert'
 
 website_scanners = [
     Scanner(
-        'http://www.avgthreatlabs.com/ww-en/website-safety-reports/domain',
+        'http://www.avgthreatlabs.com/ww-en/website-safety-reports/domain/',
         'website',
         '//div[contains(@class, "rating")]/text()'
     )
@@ -19,18 +20,29 @@ website_scanners = [
 
 email_scanners = [
     Scanner(
-        'https://hunter.io/trial/v2/email-verifier?email=ivamajnar@foi.hr&format=json',
+        'https://api.hunter.io/v2/email-verifier?'
+        'api_key=8a483e0389d17d1009b14b9311bc268da6b3e2a0&email=',
         'email',
-        {"json": "data.result"}
+        "api-hunter",
+        True
     )
 ]
 
+
+def decode_api_hunter(data):
+    data = json.loads(data)
+
+    return data["data"]["result"] + ", score: " + str(data["data"]["score"])
+
+
 results = []
+options = {
+    "api-hunter": decode_api_hunter
+}
 
 
 def do_request(url, param):
-    print(url + "/" + param)
-    response = requests.get(url + "/" + param)
+    response = requests.get(url + param)
     response.encoding = 'ISO-8859-1'
 
     return response.content
@@ -45,35 +57,39 @@ def main(email, website):
         return
 
     if email:
-        print("Email search not implemented yet.")
-
-        return
-
         for target in email_scanners:
-            scraper = Scraper(Scraper.html_dom(do_request(target.url, email)))
+            if target.is_json:
+                data = options[target.identifier](do_request(target.url, email))
+            else:
+                scraper = Scraper(Scraper.html_dom(do_request(target.url, email)))
+                data = scraper.get_custom_filter(target.identifier)[0].strip()
 
             results.append(
                 Result(target,
                        kind=target.kind,
-                       data=scraper.get_custom_filter(target.identifier)[0].strip(),
+                       data=data,
                        subject=email
                        )
             )
 
     if website:
         for target in website_scanners:
-            scraper = Scraper(Scraper.html_dom(do_request(target.url, website)))
+            if target.is_json:
+                data = options[target.identifier](do_request(target.url, website))
+            else:
+                scraper = Scraper(Scraper.html_dom(do_request(target.url, website)))
+                data = scraper.get_custom_filter(target.identifier)[0].strip()
 
             results.append(
                 Result(target,
                        kind=target.kind,
-                       data=scraper.get_custom_filter(target.identifier)[0].strip(),
+                       data=data,
                        subject=website
                        )
             )
 
     for result in results:
         print(result.subject + " (" + result.kind + ") STATUS: " + result.data
-              + " (" + result.target.url + "/" + result.subject + ")\n")
+              + " (" + result.target.url + "/" + result.subject + ")")
 
 main()
