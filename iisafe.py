@@ -31,8 +31,10 @@ email_scanners = [
 
 def decode_api_hunter(data):
     data = json.loads(data)
-
-    return data["data"]["result"] + ", score: " + str(data["data"]["score"])
+    try:
+        return data["data"]["result"] + ", score: " + str(data["data"]["score"])
+    except KeyError:
+        return "Not a valid email address"
 
 
 results = []
