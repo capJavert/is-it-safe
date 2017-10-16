@@ -21,7 +21,7 @@ website_scanners = [
 email_scanners = [
     Scanner(
         'https://api.hunter.io/v2/email-verifier?'
-        'api_key=8a483e0389d17d1009b14b9311bc268da6b3e2a0&email=',
+        'api_key={HUNTER_API_KEY}&email=',
         'email',
         "api-hunter",
         True
